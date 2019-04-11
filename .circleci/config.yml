@@ -8,8 +8,8 @@ jobs:
     docker:
       # specify the version you desire here
       - image: circleci/node:8.9.0
-      
+      working_directory: ~/test/PracticeTest
       steps:
-      -checkout
+      - checkout
       - run: npm install
-      - run:npm test
+      - run: npm test
