@@ -31,7 +31,7 @@ jobs:
       # Deploy the retrieve repository files to the VM via rSync SSH...
       - run: 
             name: Deploy Project Files
-            command: rsync --exclude='.git/' --exclude='README.md' -e ssh -avvz ~/home/ launch@10.137.0.159
+            command: rsync --exclude='.git/' --exclude='README.md' -e ssh -avvz ~/home/ launch launch@10.137.0.159
                 #if [ "${CIRCLE_BRANCH}" = "master" ]; then
                       #rsync ssh command
                 #else
