@@ -1,37 +1,47 @@
-# Javascript Node CircleCI 2.0 configuration file
-#
-# Check https://circleci.com/docs/2.0/language-javascript/ for more details
-#
+# Use version 2 of CircleCI
 version: 2
+
 jobs:
-  build:
+  
+  # Define a deploy job
+  setup_build_deploy:
+  
+    # Deploy with the Latest Node Docker Image
     docker:
-      # specify the version you desire here
-      - image: circleci/node:7.10
-
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/mongo:3.4.4
-
-    working_directory: ~/test/PracticeTest
-
+      - image: circleci/node:latest
+      
     steps:
-      - checkout
+    
+      # Add the SSH Keys from the Project Settings
+      - add_ssh_keys
+      
+      # Checkout the code from the repository
+      - checkout              
+      
+      # Resolve the SSH Keys
+      - run:
+          name: Resolve Keys
+          command: ssh-keyscan -H 10.137.0.159 >> ~/.ssh/known_hosts
+          
+      # Install rSync
+      - run: 
+            name: rSync Install
+            command: sudo apt install -y rsync
+      
+      # Deploy the retrieve repository files to the VM via rSync SSH...
+      - run: 
+            name: Deploy Project Files
+            command: rsync --exclude='.git/' --exclude='README.md' -e ssh -avvz ~/firstapp/ launch@10.137.0.159:/home/launch
+                #if [ "${CIRCLE_BRANCH}" = "master" ]; then
+                      #rsync ssh command
+                #else
+                      #echo "not master branch."
+                #fi
+      
+workflows:
 
-      # Download and cache dependencies
-      - restore_cache:
-          keys:
-            - v1-dependencies-{{ checksum "package.json" }}
-            # fallback to using the latest cache if no exact match is found
-            - v1-dependencies-
-
-      - run: npm install
-
-      - save_cache:
-          paths:
-            - node_modules
-          key: v1-dependencies-{{ checksum "package.json" }}
-
-      # run tests!
-      #- run: npm test
+  # Use version 2 of CircleCI
+  version: 2
+  easy-deploy:
+    jobs:
+      - setup_build_deploy
